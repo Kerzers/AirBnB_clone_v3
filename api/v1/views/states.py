@@ -13,7 +13,7 @@ def states():
     list_states = []
     for state in dict_states.values():
         list_states.append(state.to_dict())
-    return list_states
+    return jsonify(list_states)
 
 
 @app_views.route("/states/<id>", methods=["GET"], strict_slashes=False)
@@ -30,6 +30,8 @@ def del_state(id):
     dict_states = storage.all(State)
     for key in dict_states.keys():
         if key.split(".")[1] == id:
+            storage.delete(dict_states)
+            storage.save()
             return {}
     abort(404)
 
