@@ -18,60 +18,52 @@ def states():
 
 @app_views.route("/states/<id>", methods=["GET"], strict_slashes=False)
 def states_id(id):
-    dict_states = storage.all(State)
-    for key in dict_states.keys():
-        if key.split(".")[1] == id:
-            return jsonify(dict_states[key].to_dict())
-    abort(404)
+    state = storage.get(State, id)
+    if not state:
+        abort(404)
+    return jsonify(state.to_dict())
 
 
 @app_views.route("/states/<id>", methods=["DELETE"], strict_slashes=False)
 def del_state(id):
-    dict_states = storage.all(State)
-    for v in dict_states.values():
-        if v.id == id:
-            storage.delete(v)
-            storage.save()
-            return {}
-    abort(404)
+    state = storage.get(State, id)
+    if not state:
+        abort(404)
+    storage.delete(state)
+    storage.save()
+    return jsonify({})
 
 
-@app_views.route("/states/", methods=["POST"], strict_slashes=False)
+@app_views.route("/states", methods=["POST"], strict_slashes=False)
 def create_state():
-    try:
-        response = request.get_json()
-    except ValueError:
-        return jsonify({"Not a JSON"}), 400
+
+    response = request.get_json()
+    if not response:
+        abort(400, description="Not a JSON")
+
     if 'name' not in response:
-        return jsonify({"Missing name"}), 400
+        abort(400, description="Missing name")
 
     new_state = State(name=response['name'])
-    storage.new(new_state)
-    storage.save()
+    new_state.save()
 
     return jsonify(new_state.to_dict()), 201
 
 
 @app_views.route("/states/<id>", methods=["PUT"], strict_slashes=False)
 def update_state(id):
-    dict_states = storage.all(State)
+    state = storage.get(State, id)
+    response = request.get_json()
 
-    state = None
-    for key in dict_states.keys():
-        if key.split(".")[1] == id:
-            state = dict_states[key]
-            break
-
-    if state is None:
+    if not state:
         abort(404)
+    if not response:
+        abort(400, description="Not a JSON")
 
-    try:
-        response = request.get_json()
-    except ValueError:
-        return jsonify({"Not a JSON"}), 400
-
+    not_in = ['id', 'create_at', 'updated_at']
     for key, value in response.items():
-        setattr(state, key, value)
+        if key not in not_in:
+            setattr(state, key, value)
 
     storage.save()
 
