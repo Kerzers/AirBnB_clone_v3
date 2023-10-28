@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-
+"""create a route /status on the object app_views that returns a JSON"""
 from api.v1.views import app_views
 from models import storage
 from models.state import State
@@ -15,6 +15,7 @@ def states():
         list_states.append(state.to_dict())
     return list_states
 
+
 @app_views.route("/states/<id>", methods=["GET"], strict_slashes=False)
 def states_id(id):
     dict_states = storage.all(State)
@@ -23,6 +24,7 @@ def states_id(id):
             return jsonify(dict_states[key].to_dict())
     abort(404)
 
+
 @app_views.route("/states/<id>", methods=["DELETE"], strict_slashes=False)
 def del_state(id):
     dict_states = storage.all(State)
@@ -30,6 +32,7 @@ def del_state(id):
         if key.split(".")[1] == id:
             return {}
     abort(404)
+
 
 @app_views.route("/states/", methods=["POST"], strict_slashes=False)
 def create_state():
@@ -46,10 +49,11 @@ def create_state():
 
     return jsonify(new_state.to_dict()), 201
 
+
 @app_views.route("/states/<id>", methods=["PUT"], strict_slashes=False)
 def update_state(id):
     dict_states = storage.all(State)
-    
+
     state = None
     for key in dict_states.keys():
         if key.split(".")[1] == id:
