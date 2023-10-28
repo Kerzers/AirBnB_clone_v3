@@ -28,9 +28,9 @@ def states_id(id):
 @app_views.route("/states/<id>", methods=["DELETE"], strict_slashes=False)
 def del_state(id):
     dict_states = storage.all(State)
-    for key in dict_states.keys():
-        if key.split(".")[1] == id:
-            storage.delete(dict_states)
+    for v in dict_states.values():
+        if v.id == id:
+            storage.delete(v)
             storage.save()
             return {}
     abort(404)
