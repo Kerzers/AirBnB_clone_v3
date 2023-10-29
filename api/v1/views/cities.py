@@ -41,6 +41,7 @@ def del_city(id):
                  strict_slashes=False)
 def create_city(state_id):
     state = storage.get(State, state_id)
+    # print("test: ".format(state))
     if state is None:
         abort(404)
 
@@ -53,6 +54,7 @@ def create_city(state_id):
 
     new_city = City(name=response['name'])
     new_city.state_id = state.id
+    # storage.save()
     new_city.save()
 
     return jsonify(new_city.to_dict()), 201
