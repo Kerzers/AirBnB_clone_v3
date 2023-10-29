@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+"""create a route /places on the object app_views that returns a JSON"""
 from api.v1.views import app_views
 from models import storage
 from models.place import Place
