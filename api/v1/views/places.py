@@ -7,7 +7,8 @@ from flask import jsonify, abort
 from flask import request
 
 
-@app_views.route("/cities/<city_id>/places", methods=["GET"], strict_slashes=False)
+@app_views.route("/cities/<city_id>/places", methods=["GET"],
+                 strict_slashes=False)
 def palces(city_id):
     list_places = []
     city = storage.get(City, places_id)
