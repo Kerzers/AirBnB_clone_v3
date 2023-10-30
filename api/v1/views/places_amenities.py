@@ -7,6 +7,7 @@ from models.amenity import Amenity
 from flask import jsonify, abort, request
 from os import getenv
 
+
 @app_views.route("/places/<place_id>/amenities",
                  methods=["GET"], strict_slashes=False)
 def get_place_amenities(place_id):
@@ -31,7 +32,7 @@ def get_place_amenities(place_id):
 def delete_place_amenity(place_id, amenity_id):
     place = storage.get(Place, place_id)
     amenity = storage.get(Amenity, amenity_id)
-    
+
     if place is None or amenity is None:
         abort(404)
 
@@ -53,7 +54,7 @@ def delete_place_amenity(place_id, amenity_id):
 def add_place_amenity(place_id, amenity_id):
     place = storage.get(Place, place_id)
     amenity = storage.get(Amenity, amenity_id)
-    
+
     if place is None or amenity is None:
         abort(404)
 
