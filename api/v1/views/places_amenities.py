@@ -8,17 +8,18 @@ from flask import jsonify, abort, request
 from os import getenv
 
 
-@app_views.route("/places/<place_id>/amenities",
-                 methods=["GET"], strict_slashes=False)
-def get_place_amenities(place_id):
+@app_views.route("/places/<place_id>/amenities", methods=["GET"],
+                 strict_slashes=False)
+def amenities(place_id):
     place = storage.get(Place, place_id)
     if place is None:
         abort(404)
 
+    list_amenities = []
     if getenv("HBNB_TYPE_STORAGE") == "db":
-        list_amenities = [amenity.to_dict() for amenity in place.amenities]
+        for amenity in place.amenities:
+            list_amenities.append(amenity.to_dict())
     else:
-        list_amenities = []
         for amenity_id in place.amenity_ids:
             amenity = storage.get(Amenity, amenity_id)
             if amenity:
@@ -29,21 +30,23 @@ def get_place_amenities(place_id):
 
 @app_views.route("/places/<place_id>/amenities/<amenity_id>",
                  methods=["DELETE"], strict_slashes=False)
-def delete_place_amenity(place_id, amenity_id):
+def place_amenity_id(place_id, amenity_id):
     place = storage.get(Place, place_id)
     amenity = storage.get(Amenity, amenity_id)
-
-    if place is None or amenity is None:
+    if place is None:
         abort(404)
-
+    if amenity is None:
+        abort(404)
     if getenv("HBNB_TYPE_STORAGE") == "db":
-        if amenity not in place.amenities:
+        if amenity in place.amenities:
+            place.amenities.remove(amenity)
+        else:
             abort(404)
-        place.amenities.remove(amenity)
     else:
-        if amenity_id not in place.amenity_ids:
+        if amenity_id in place.amenity_ids:
+            place.amenity_ids.remove(amenity_id)
+        else:
             abort(404)
-        place.amenity_ids.remove(amenity_id)
 
     storage.save()
     return jsonify({}), 200
@@ -51,21 +54,24 @@ def delete_place_amenity(place_id, amenity_id):
 
 @app_views.route("/places/<place_id>/amenities/<amenity_id>",
                  methods=["POST"], strict_slashes=False)
-def add_place_amenity(place_id, amenity_id):
+def create_place_amenity(place_id, amenity_id):
+
     place = storage.get(Place, place_id)
     amenity = storage.get(Amenity, amenity_id)
-
-    if place is None or amenity is None:
+    if place is None:
         abort(404)
-
+    if amenity is None:
+        abort(404)
     if getenv("HBNB_TYPE_STORAGE") == "db":
         if amenity in place.amenities:
-            return jsonify(amenity.to_dict()), 200
-        place.amenities.append(amenity)
+            return jasonify(amenity.to_dict()), 200
+        else:
+            place.amenities.append(amenity)
     else:
         if amenity_id in place.amenity_ids:
-            return jsonify(amenity.to_dict()), 200
-        place.amenity_ids.append(amenity_id)
+            return jasonify(amenity.to_dict()), 200
+        else:
+            place.amenity_ids.append(amenity_id)
 
     storage.save()
     return jsonify(amenity.to_dict()), 201
