@@ -82,7 +82,7 @@ class DBStorage:
             for key in dict_obj.keys():
                 if key.split(".")[1] == id:
                     return dict_obj[key]
-                return None
+            return None
         return None
 
     def count(self, cls=None):

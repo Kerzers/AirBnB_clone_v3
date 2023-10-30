@@ -46,7 +46,6 @@ def create_state():
 
     new_state = State(name=response['name'])
     new_state.save()
-
     return jsonify(new_state.to_dict()), 201
 
 
