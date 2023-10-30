@@ -51,9 +51,6 @@ def create_review(review_id):
     if response is None:
         abort(400, description="Not a JSON")
 
-    if 'name' not in response:
-        abort(400, description="Missing name")
-
     if 'user_id' not in response.keys():
         abort(400, description="Missing user_id")
 
@@ -66,7 +63,7 @@ def create_review(review_id):
         abort(404)
 
     new_review = Review(**response)
-    new_place.place_id = place.id
+    new_review.place_id = place.id
     new_review.save()
 
     return jsonify(new_review.to_dict()), 201
