@@ -30,11 +30,11 @@ class User(BaseModel, Base):
         super().__init__(*args, **kwargs)
 
     @property
-    def password(self):
+    def _password(self):
         """password getter"""
         return self.password
 
-    @password.setter
-    def password(self, value):
+    @_password.setter
+    def _password(self, value):
         """password setter"""
         self.password = md5(value.encode()).hexdigest()
