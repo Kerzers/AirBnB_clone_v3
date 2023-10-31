@@ -42,9 +42,9 @@ def del_review(review_id):
 
 @app_views.route("/places/<place_id>/reviews", methods=["POST"],
                  strict_slashes=False)
-def create_review(review_id):
-    review = storage.get(Review, review_id)
-    if review is None:
+def create_review(place_id):
+    place = storage.get(Place, place_id)
+    if place is None:
         abort(404)
 
     response = request.get_json()
@@ -54,13 +54,11 @@ def create_review(review_id):
     if 'user_id' not in response.keys():
         abort(400, description="Missing user_id")
 
+    if storage.get(User, response['user_id']) is None:
+        abort(404)
+
     if 'text' not in response.keys():
         abort(400, description="Missing text")
-
-    dict_users = storage.all(User)
-
-    if response['user_id'] not in dict_users:
-        abort(404)
 
     new_review = Review(**response)
     new_review.place_id = place.id
